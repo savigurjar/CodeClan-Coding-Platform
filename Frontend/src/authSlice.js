@@ -1,23 +1,28 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axiosClient from './utils/axiosClient'
+import axiosClient from './utils/axiosClient';
 
+// ========== REGISTER ==========
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
+      console.log('Registering user:', userData);
       const response = await axiosClient.post('/user/register', userData);
       return response.data.user;
     } catch (error) {
+      console.error('Register error:', error);
       return rejectWithValue({
-        message: error?.response?.data?.message || error.message || 'Registration failed',
+        message:
+          error?.response?.data?.message ||
+          error.message ||
+          'Registration failed',
         status: error?.response?.status,
       });
     }
   }
 );
 
-
-
+// ========== LOGIN ==========
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -25,11 +30,19 @@ export const loginUser = createAsyncThunk(
       const response = await axiosClient.post('/user/login', credentials);
       return response.data.user;
     } catch (error) {
-      return rejectWithValue(error);
+      console.error('Login error:', error);
+      return rejectWithValue({
+        message:
+          error?.response?.data?.message ||
+          error.message ||
+          'Login failed',
+        status: error?.response?.status,
+      });
     }
   }
 );
 
+// ========== CHECK AUTH ==========
 export const checkAuth = createAsyncThunk(
   'auth/check',
   async (_, { rejectWithValue }) => {
@@ -37,11 +50,19 @@ export const checkAuth = createAsyncThunk(
       const { data } = await axiosClient.get('/user/check');
       return data.user;
     } catch (error) {
-      return rejectWithValue(error);
+      console.error('Check auth error:', error);
+      return rejectWithValue({
+        message:
+          error?.response?.data?.message ||
+          error.message ||
+          'Auth check failed',
+        status: error?.response?.status,
+      });
     }
   }
 );
 
+// ========== LOGOUT ==========
 export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
@@ -49,24 +70,31 @@ export const logoutUser = createAsyncThunk(
       await axiosClient.post('/logout');
       return null;
     } catch (error) {
-      return rejectWithValue(error);
+      console.error('Logout error:', error);
+      return rejectWithValue({
+        message:
+          error?.response?.data?.message ||
+          error.message ||
+          'Logout failed',
+        status: error?.response?.status,
+      });
     }
   }
 );
 
+// ========== SLICE ==========
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
     isAuthenticated: false,
     loading: false,
-    error: null
+    error: null,
   },
-  reducers: {
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      // Register User Cases
+      // REGISTER
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -78,12 +106,11 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Something went wrong';
+        state.error = action.payload?.message || 'Registration failed';
         state.isAuthenticated = false;
-        state.user = null;
       })
-  
-      // Login User Cases
+
+      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -95,12 +122,11 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Something went wrong';
+        state.error = action.payload?.message || 'Login failed';
         state.isAuthenticated = false;
-        state.user = null;
       })
-  
-      // Check Auth Cases
+
+      // CHECK AUTH
       .addCase(checkAuth.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -112,12 +138,11 @@ const authSlice = createSlice({
       })
       .addCase(checkAuth.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Something went wrong';
+        state.error = action.payload?.message || 'Auth check failed';
         state.isAuthenticated = false;
-        state.user = null;
       })
-  
-      // Logout User Cases
+
+      // LOGOUT
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -126,15 +151,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = null;
         state.isAuthenticated = false;
-        state.error = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Something went wrong';
+        state.error = action.payload?.message || 'Logout failed';
         state.isAuthenticated = false;
-        state.user = null;
       });
-  }
+  },
 });
 
 export default authSlice.reducer;

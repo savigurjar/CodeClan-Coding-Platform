@@ -3,17 +3,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import {registerUser} from '../authSlice'
+import { registerUser } from '../authSlice';
 import { useEffect } from 'react';
 
 const signupSchema = z.object({
   firstName: z.string().min(3, "Minimum character should be 3"),
   emailId: z.string().email("Invalid Email"),
-  password: z.string().min(8, "Password is to weak")
+  password: z.string().min(8, "Password is too weak"),
 });
 
 function Signup() {
-   
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
@@ -28,19 +27,20 @@ function Signup() {
     if (isAuthenticated) {
       navigate('/');
     }
-  }, [isAuthenticated,navigate]);
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = (data) => {
     dispatch(registerUser(data));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"> {/* Centering container */}
-      <div className="card w-96 bg-base-100 shadow-xl"> {/* Existing card styling */}
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
-          <h2 className="card-title justify-center text-3xl">Leetcode</h2> {/* Centered title */}
+          <h2 className="card-title justify-center text-3xl">Leetcode</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* Existing form fields */}
+            
+            {/* First Name */}
             <div className="form-control">
               <label className="label mb-1">
                 <span className="label-text">First Name</span>
@@ -56,7 +56,8 @@ function Signup() {
               )}
             </div>
 
-            <div className="form-control  mt-4">
+            {/* Email */}
+            <div className="form-control mt-4">
               <label className="label mb-1">
                 <span className="label-text">Email</span>
               </label>
@@ -71,6 +72,7 @@ function Signup() {
               )}
             </div>
 
+            {/* Password */}
             <div className="form-control mt-4">
               <label className="label mb-1">
                 <span className="label-text">Password</span>
@@ -86,14 +88,23 @@ function Signup() {
               )}
             </div>
 
+            {/* Submit Button */}
             <div className="form-control mt-6 flex justify-center">
               <button
                 type="submit"
                 className="btn btn-primary"
+                disabled={loading}
               >
-                Sign Up
+                {loading ? 'Signing Up...' : 'Sign Up'}
               </button>
             </div>
+
+            {/* 🔥 Backend Error Display */}
+            {error && (
+              <p className="text-red-500 text-center mt-3 font-medium">
+                {error}
+              </p>
+            )}
           </form>
         </div>
       </div>
@@ -102,6 +113,3 @@ function Signup() {
 }
 
 export default Signup;
-
-
-
