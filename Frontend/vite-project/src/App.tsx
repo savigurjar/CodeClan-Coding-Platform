@@ -9,7 +9,7 @@ function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<h1 className="p-4">Welcome to CodeClan</h1>} />
+        <Route path="/" element={<h1 className="p-4">Welcome to the CodeClan</h1>} />
         <Route path="/problems" element={<h1 className="p-4">Problems Page</h1>} />
         <Route path="/contests" element={<h1 className="p-4">Contests Page</h1>} />
         <Route path="/discuss" element={<h1 className="p-4">Discuss Page</h1>} />
